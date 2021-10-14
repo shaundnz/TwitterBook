@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TwitterBook.Models;
 
 namespace TwitterBook.Data
 {
@@ -12,5 +13,9 @@ namespace TwitterBook.Data
             : base(options)
         {
         }
+
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Tag> Tags { get; set; }
     }
 }

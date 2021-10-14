@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TwitterBook.DTO.V1.Requests;
 using TwitterBook.DTO.V1.Responses;
+using TwitterBook.Extensions;
 using TwitterBook.Models;
 using TwitterBook.Services;
 
@@ -12,6 +16,7 @@ namespace TwitterBook.Controllers.V1
 {
     [ApiController]
     [Route("/api/v1/posts")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PostsController : Controller
     {
 
@@ -24,48 +29,46 @@ namespace TwitterBook.Controllers.V1
         }
 
         [HttpGet]
-        public IActionResult GetAllPosts()
+        public async Task<IActionResult> GetAllPosts()
         {
-            return Ok(_postService.GetPosts());
+            return Ok(await _postService.GetPostsAsync());
         }
 
         [HttpPost]
-        public IActionResult CreatePost([FromBody] CreatePostRequestDTO createPostRequestDTO)
+        public async Task<IActionResult> CreatePost([FromBody] CreatePostRequestDTO createPostRequestDTO)
         {
 
-            var post = new Post { Id = createPostRequestDTO.Id };
+            var post = new Post { Name = createPostRequestDTO.Name, 
+                Tags = createPostRequestDTO.Tags.Select(t => new Tag { TagString = t }).ToList(), 
+                UserId = HttpContext.GetUserId() 
+            };
+            await _postService.CreatePostAsync(post);
 
-            if (post.Id == Guid.Empty)
-            {
-                post.Id = Guid.NewGuid();
-            }
-
-            _postService.GetPosts().Add(post);
-
-            var response = new CreatePostResponseDTO { Id = post.Id };
+            var response = new CreatePostResponseDTO { Id = post.Id, Tags = post.Tags.Select(t => t.TagString).ToList() };
             return CreatedAtAction(nameof(GetPost), new { postId = post.Id}, response);
         }
 
         [HttpGet("{postId}")]
-        public IActionResult GetPost([FromRoute] Guid postId)
+        public async Task<IActionResult> GetPost([FromRoute] Guid postId)
         {
-            var post = _postService.GetPostById(postId);
+            var post = await _postService.GetPostByIdAsync(postId);
             if (post == null) return NotFound();
 
             return Ok(post);
         }
 
         [HttpPut("{postId}")]
-        public IActionResult UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequestDTO updatePostRequestDTO)
-        { 
+        public async Task<IActionResult> UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequestDTO updatePostRequestDTO)
+        {
 
-            var post = new Post
-            {
-                Id = postId,
-                Name = updatePostRequestDTO.Name
-            };
+            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
 
-            var updated = _postService.UpdatedPost(post);
+            if (!userOwnsPost) return Unauthorized(new { error = "You cannot modify this post" });
+
+            var post = await _postService.GetPostByIdAsync(postId);
+            post.Name = updatePostRequestDTO.Name;
+
+            var updated = await _postService.UpdatedPostAsync(post);
 
             if (!updated) return NotFound();
 
@@ -73,9 +76,13 @@ namespace TwitterBook.Controllers.V1
         }
 
         [HttpDelete("{postId}")]
-        public IActionResult DeletePost([FromRoute] Guid postId)
+        public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
         {
-            var deleted = _postService.DeletePost(postId);
+            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
+
+            if (!userOwnsPost) return Unauthorized(new { error = "You cannot delete this post" });
+
+            var deleted = await _postService.DeletePostAsync(postId);
 
             // Could return 200 OK with item in the body here
             if (!deleted) return NotFound();

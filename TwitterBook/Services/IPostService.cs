@@ -9,12 +9,17 @@ namespace TwitterBook.Services
     public interface IPostService
     {
 
-        List<Post> GetPosts();
+        Task<List<Post>> GetPostsAsync();
 
-        Post GetPostById(Guid postId);
+        Task<Post> GetPostByIdAsync(Guid postId);
 
-        bool UpdatedPost(Post postToUpdate);
+        Task<bool> CreatePostAsync(Post post);
 
-        bool DeletePost(Guid postId);
+        Task<bool> UpdatedPostAsync(Post postToUpdate);
+
+        Task<bool> DeletePostAsync(Guid postId);
+        Task<bool> UserOwnsPostAsync(Guid postId, string userId);
+
+        Task<List<Tag>> GetAllTagsAsync();
     }
 }

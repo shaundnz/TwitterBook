@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterBook", "TwitterBook\TwitterBook.csproj", "{E451A12E-2FB9-490F-A141-9933954D469A}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitterBook", "TwitterBook\TwitterBook.csproj", "{E451A12E-2FB9-490F-A141-9933954D469A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterBook.IntegrationTests", "TwitterBook.IntegrationTests\TwitterBook.IntegrationTests.csproj", "{137EF3FD-7BE8-470D-9B51-C8611DD50B1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +17,15 @@ Global
 		{E451A12E-2FB9-490F-A141-9933954D469A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E451A12E-2FB9-490F-A141-9933954D469A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E451A12E-2FB9-490F-A141-9933954D469A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137EF3FD-7BE8-470D-9B51-C8611DD50B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137EF3FD-7BE8-470D-9B51-C8611DD50B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137EF3FD-7BE8-470D-9B51-C8611DD50B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137EF3FD-7BE8-470D-9B51-C8611DD50B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A210BF2-FCEC-46FF-A8F3-B0AF478ACAB9}
 	EndGlobalSection
 EndGlobal
