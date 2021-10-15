@@ -10,7 +10,7 @@ using TwitterBook.Services;
 namespace TwitterBook.Controllers.V1
 {
     [ApiController]
-    [Route("/api/tags")]
+    [Route("/api/v1/tags")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TagsController : Controller
     {
@@ -22,6 +22,7 @@ namespace TwitterBook.Controllers.V1
         }
 
         [HttpGet]
+        [Authorize(Policy = "TagViewer")]
         public async Task<IActionResult> GetTags()
         {
             return Ok(await _postService.GetAllTagsAsync());
