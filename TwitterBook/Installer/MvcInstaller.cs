@@ -6,7 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Text;
+using FluentValidation.AspNetCore;
 using TwitterBook.Authorization;
+using TwitterBook.Filters;
 using TwitterBook.Options;
 using TwitterBook.Services;
 
@@ -23,7 +25,16 @@ namespace TwitterBook.Installer
 
             services.AddScoped<IIdentityService, IdentityService>();
 
-            services.AddControllersWithViews();
+            services.AddFluentValidation(mvcConfiguration =>
+                mvcConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
+            
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(typeof(ValidationFilter));
+            }).ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             var tokenValidationParameters = new TokenValidationParameters
             {
