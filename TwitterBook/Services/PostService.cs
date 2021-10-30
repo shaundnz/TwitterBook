@@ -41,12 +41,12 @@ namespace TwitterBook.Services
 
         public async Task<Post> GetPostByIdAsync(Guid postId)
         {
-            return await _context.Posts.SingleOrDefaultAsync(post => post.Id == postId);
+            return await _context.Posts.Include(p => p.Tags).SingleOrDefaultAsync(post => post.Id == postId);
         }
 
         public async Task<List<Post>> GetPostsAsync()
         {
-            return await _context.Posts.ToListAsync();
+            return await _context.Posts.Include(p => p.Tags).ToListAsync();
         }
 
         public async Task<bool> UpdatedPostAsync(Post postToUpdate)

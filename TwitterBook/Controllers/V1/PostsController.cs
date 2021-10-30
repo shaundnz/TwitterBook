@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,17 +22,22 @@ namespace TwitterBook.Controllers.V1
     {
 
         private readonly IPostService _postService;
+        private readonly IMapper _mapper;
 
 
-        public PostsController(IPostService postService)
+        public PostsController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllPosts()
         {
-            return Ok(await _postService.GetPostsAsync());
+            var posts = await _postService.GetPostsAsync();
+            var response = _mapper.Map<List<PostResponseDTO>>(posts);
+
+            return Ok(response);
         }
 
         [HttpPost]
@@ -44,7 +50,9 @@ namespace TwitterBook.Controllers.V1
             };
             await _postService.CreatePostAsync(post);
 
-            var response = new CreatePostResponseDTO { Id = post.Id, Tags = post.Tags.Select(t => t.TagString).ToList() };
+            //var response = new CreatePostResponseDTO { Id = post.Id, Tags = post.Tags.Select(t => t.TagString).ToList() };
+            var response = _mapper.Map<PostResponseDTO>(post);
+
             return CreatedAtAction(nameof(GetPost), new { postId = post.Id}, response);
         }
 
@@ -54,7 +62,9 @@ namespace TwitterBook.Controllers.V1
             var post = await _postService.GetPostByIdAsync(postId);
             if (post == null) return NotFound();
 
-            return Ok(post);
+            var response = _mapper.Map<PostResponseDTO>(post);
+
+            return Ok(response);
         }
 
         [HttpPut("{postId}")]
@@ -72,7 +82,9 @@ namespace TwitterBook.Controllers.V1
 
             if (!updated) return NotFound();
 
-            return Ok(post);
+            var response = _mapper.Map<PostResponseDTO>(post);
+
+            return Ok(response);
         }
 
         [HttpDelete("{postId}")]

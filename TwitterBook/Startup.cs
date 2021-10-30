@@ -30,9 +30,13 @@ namespace TwitterBook
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
             new DbInstaller().Install(services, Configuration);
 
-            new MvcInstaller().Install(services, Configuration); 
+            new MvcInstaller().Install(services, Configuration);
+
+            services.AddAutoMapper(typeof(Startup));
             
         }
 
